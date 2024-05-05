@@ -3,7 +3,7 @@ import { Select ,Space} from "antd";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-const ApexBarChart = () => {
+const ApexBarChart = ({type='export'}) => {
   const [series, setSeries] = useState([
     {
       name: "Xuất kho",
@@ -47,6 +47,8 @@ const ApexBarChart = () => {
         "17/4/2023",
       ],
     },
+    // colors:['#33b2df', '#546E7A'],
+
     yaxis: {
       title: {
         text: "Thống kê",

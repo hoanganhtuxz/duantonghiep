@@ -1,20 +1,24 @@
 import React from "react";
 import { InboxOutlined } from "@ant-design/icons";
-import { message, Upload } from "antd";
+import { Upload ,Form} from "antd";
 const { Dragger } = Upload;
+
 const UploadFileProduct = () => {
+  const form = Form.useForm()
+  
   return (
     <div>
-      <Dragger {...props}>
+    
+      <Dragger>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
         <p className="ant-upload-text">
-          Click or drag file to this area to upload
+          Nhấp hoặc kéo tệp vào khu vực này để tải lên
         </p>
         <p className="ant-upload-hint">
-          Support for a single or bulk upload. Strictly prohibited from
-          uploading company data or other banned files.
+          Hỗ trợ tải lên một lần hoặc hàng loạt. Nghiêm cấm tải lên dữ liệu công
+          ty hoặc các tập tin bị cấm khác.
         </p>
       </Dragger>
     </div>
