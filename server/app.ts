@@ -10,6 +10,7 @@ import warehouseRouter from "./routes/warehouse.route";
 import statusRouter from "./routes/status.route";
 import classificationRouter from "./routes/classification.route";
 import { conditionRouter } from './routes/condition.route';
+import reportRoute from "./routes/report.routes";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -49,6 +50,7 @@ app.use("/api/v1", warehouseRouter);
 app.use("/api/v1", statusRouter);
 app.use("/api/v1", classificationRouter);
 app.use("/api/v1", conditionRouter);
+app.use("/api/v1", reportRoute);
 
 // testing  api
 
