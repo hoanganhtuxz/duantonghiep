@@ -4,7 +4,7 @@ import { iStatus } from "./status.model";
 import { iClassification } from "./classification.model";
 import { iCondition } from './condition.model';
 
-interface iWarehouse extends Document {
+export interface iWarehouse extends Document {
   name: string;
   description: string;
   quantity: number;
