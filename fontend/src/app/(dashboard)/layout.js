@@ -14,6 +14,7 @@ import {
   BarChartOutlined,
   LogoutOutlined,
   EditOutlined,
+  PlusSquareOutlined 
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme, Dropdown, Avatar } from "antd";
 import Loading from "./loading";
@@ -44,6 +45,11 @@ const sidebarItem = [
     key: "/overview",
     icon: <BarChartOutlined />,
     label: "Tổng quan",
+  },
+  {
+    key: "/export-import",
+    icon: <PlusSquareOutlined />,
+    label: "Xuất/Nhập kho",
   },
   {
     key: "/accounts",

@@ -1,9 +1,8 @@
-
-import { Select ,Space} from "antd";
-import React, { useState } from "react";
+import { Select, Space } from "antd";
+import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-const ApexBarChart = ({type='export'}) => {
+const ApexBarChart = ({ type = "export" }) => {
   const [series, setSeries] = useState([
     {
       name: "Xuất kho",
@@ -47,8 +46,6 @@ const ApexBarChart = ({type='export'}) => {
         "17/4/2023",
       ],
     },
-    // colors:['#33b2df', '#546E7A'],
-
     yaxis: {
       title: {
         text: "Thống kê",
@@ -65,6 +62,12 @@ const ApexBarChart = ({type='export'}) => {
       },
     },
   });
+
+  // useEffect(() => {
+  //   if (type === "export") {
+  //     setOptions((prev) => ({ ...prev, colors: ["#2db052", "#c166ff"] }));
+  //   }
+  // }, [type]);
 
   return (
     <div>
