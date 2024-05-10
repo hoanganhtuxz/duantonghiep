@@ -13,6 +13,8 @@ const nextConfig = {
     eslint: {
       ignoreDuringBuilds: true,
     },
+    swcMinify: true,
+    // fastRefresh: true,
   };
   
   export default nextConfig;

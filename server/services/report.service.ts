@@ -11,7 +11,7 @@ interface IOptionCreateReport {
   type: string
 }
 
-export const createReportHandler = async (payload: [ICreateReport], options: IOptionCreateReport) => {
+export const createReportHandler = async (payload: ICreateReport[], options: IOptionCreateReport) => {
   const now = new Date();
   now.setHours(10);
   now.setMinutes(0);
