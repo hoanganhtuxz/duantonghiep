@@ -175,6 +175,11 @@ const ExportProduct = () => {
             style={{ height: 100, resize: "none" }}
           />
         </Form.Item>
+        <Form.Item>
+      <div className="flex justify-end">
+      <Button type="primary" htmlType="submit">Xác nhận xuất kho</Button>
+      </div>
+        </Form.Item>
       </Form>
     </div>
   );

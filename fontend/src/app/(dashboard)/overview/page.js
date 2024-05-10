@@ -6,7 +6,7 @@ import StatisticalTables from "./(component)/statistical-tables";
 
 export default function Page() {
   return <div>
-    <div className="text-md font-bold mb-4">Biểu đồ thống kê Nhập kho</div>
+    <div className="text-md font-bold mb-4">Biểu đồ thống kê</div>
     <ApexBarChart type="import" />
     {/* <div className="text-md font-bold mb-4">Biểu đồ thống kê Xuất kho</div>
     <ApexBarChart /> */}

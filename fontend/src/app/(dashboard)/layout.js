@@ -3,8 +3,10 @@
 import { useRecoilValue } from "recoil";
 import { userInfoSelector } from "../../atom";
 import { useEffect } from "react";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Suspense } from "react";
+import { MdHomeWork } from "react-icons/md";
+
 import React, { useState } from "react";
 import {
   MenuFoldOutlined,
@@ -14,9 +16,9 @@ import {
   BarChartOutlined,
   LogoutOutlined,
   EditOutlined,
-  PlusSquareOutlined 
+  PlusSquareOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, Button, theme, Dropdown, Avatar } from "antd";
+import { Layout, Menu, Button, theme, Dropdown, Avatar, Space } from "antd";
 import Loading from "./loading";
 import { AiOutlineAlignRight } from "react-icons/ai";
 import { CiShoppingTag } from "react-icons/ci";
@@ -89,6 +91,7 @@ export default function DashboardLayout({
   const userInfo = useRecoilValue(userInfoSelector);
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -145,11 +148,18 @@ export default function DashboardLayout({
         }}
         className="border-r"
       >
-        <div className="demo-logo-vertical h-[64px]" />
+        <div className="demo-logo-vertical h-[64px] border-b pl-7 pt-4">
+          <Space>
+            <MdHomeWork className="text-xl text-blue-800" />
+            <h3 className="font-semibold text-xl  text-blue-700">
+              Interior
+            </h3>
+          </Space>
+        </div>
         <Menu
+          selectedKeys={[pathname]}
           theme="light"
           mode="inline"
-          defaultSelectedKeys={[pathname]}
           onClick={handleMenu}
           items={itemRole() || []}
         />
