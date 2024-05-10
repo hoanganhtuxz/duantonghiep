@@ -4,6 +4,8 @@ import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middieware/catchAsyncError";
 import ProductModel from "../models/warehouse.model";
 import { createProduct } from "../services/warehouse.service";
+import { createReportHandler } from "../services/report.service";
+import { REPORT_IMPORT_PRODUCT } from "../utils/constants";
 
 ///  interface  Product
 interface iProduct {
@@ -257,3 +259,81 @@ export const deleteProductById = CatchAsyncError(
     }
   }
 );
+
+const validateImportProduct = (payload: any[]) => {
+  let result = '';
+  for (let idx = 0; idx < payload.length; idx += 1) {
+    const item = payload[idx]
+    if (!item || typeof item !== 'object' || !Object.keys(item).length) {
+      result = `Invalid payload (${idx}).`;
+      break;
+    }
+
+    if (!item.code) {
+      result = `Invalid product code (${idx}).`;
+      break;
+    }
+
+    if (!Number(item.quantity)) {
+      result = `Invalid quantity of product ${item.code} (${idx}).`
+      break;
+    }
+
+    if (!Number(item.price)) {
+      result = `Invalid price of product ${item.code} (${idx}).`
+      break;
+    }
+  }
+
+  return result;
+}
+
+export const importProductController = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const payload: any[] = req.body;
+
+  if (!payload.length) {
+    return next(new ErrorHandler('Invalid payload.', 400))
+  }
+
+  const hasErrorMsg = validateImportProduct(payload);
+
+  if (hasErrorMsg) {
+    return next(new ErrorHandler(hasErrorMsg, 400))
+  }
+
+  const countByCode = await ProductModel.countDocuments({ code: { $in: payload.map((i) => i.code) }})
+  if (countByCode !== payload.length) {
+    return next(new ErrorHandler('Some product could not found. Please check again.', 400))
+  }
+
+  const payloadCreateImportReport = [];
+
+  await Promise.all(payload.map(async (item: any) => {
+    const productUpdated = await ProductModel.findOneAndUpdate(
+      { code: item.code },
+      [{
+        $set: {
+          price: Number(item.price),
+          quantity: {
+            $sum: ['$quantity', Number(item.quantity)]
+          }
+        }
+      }],
+      { new: true }
+    );
+
+    // const productFound = await ProductModel.findOne({ code: item.code });
+
+    payloadCreateImportReport.push({
+      warehouseId: productUpdated._id,
+      quantity: Number(item.quantity),
+    });
+  }));
+
+  // không cần await vì cho nó chạy ngầm để tăng thời gian response
+  createReportHandler(payloadCreateImportReport, { type: REPORT_IMPORT_PRODUCT })
+  return res.status(200).json({
+    success: true,
+    message: 'Import product successfully.'
+  })
+})
