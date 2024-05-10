@@ -10,6 +10,7 @@ import ReportModel from '../models/report.model';
  * @param groupBy any ==> string
  * @returns Object
  */
+
 const getGroupBy = (groupBy: any): any => {
   // mặc định là date
   const result = {
