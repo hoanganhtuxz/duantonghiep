@@ -6,6 +6,7 @@ import { iCondition } from './condition.model';
 
 export interface iWarehouse extends Document {
   name: string;
+  code: string,
   description: string;
   quantity: number;
   price: number;
@@ -39,6 +40,12 @@ const warehouseSchema: Schema = new mongoose.Schema(
       ref: "Category",
       required: [false, "Please enter the product category"],
     },
+    code: {
+      type: String,
+      unique: true,
+      index:true,
+      required: [true, "Please enter the product code"],
+    },
     status: {
       type: Schema.Types.ObjectId,
       ref: "Status",
@@ -54,16 +61,17 @@ const warehouseSchema: Schema = new mongoose.Schema(
       ref: "Condition",
       required: [false, "Please enter the product condition"],
     },
+
     images: [
       {
         public_id: {
           type: String,
           required: false
-      },
-      url: {
+        },
+        url: {
           type: String,
           required: false
-      }
+        }
       },
     ],
   },

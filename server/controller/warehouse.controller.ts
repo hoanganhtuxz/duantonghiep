@@ -6,20 +6,14 @@ import ProductModel from "../models/warehouse.model";
 import { createProduct } from "../services/warehouse.service";
 
 ///  interface  Product
-interface iProduct {
-  name: string;
-  description?: string;
-  avatar?: any;
-  quantity: Number;
-  price: Number;
-  category: any;
-}
+
 
 export const uploadProduct = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body as any;
       const name = data.name;
+      const code = data.code;
       const categoryId = req.body.category;
       const avatar = data.avatar;
       const isNameAlreadyExist = await ProductModel.findOne({ name });
@@ -31,7 +25,9 @@ export const uploadProduct = CatchAsyncError(
       if (!name) {
         return next(new ErrorHandler("Please enter name Product", 400));
       }
-
+      if (!code) {
+        return next(new ErrorHandler("Please enter code product", 400));
+      }
       if (!categoryId) {
         return next(new ErrorHandler("Plase chonse category product", 400));
       }
@@ -63,41 +59,51 @@ export const editProduct = CatchAsyncError(
       const categoryId = req.body.category;
       const avatar = data.avatar;
       const ProductId = req.params.id;
+      const code = req.body.code;
 
-      // const oldProduct = await ProductModel.findOne({ ProductId });
+      const updateData: { [key: string]: any } = {};
 
       if (avatar) {
         const myCloud = await cloudinary.v2.uploader.upload(avatar, {
-          folder: "product",
+          folder: 'product',
         });
-
-        data.avatar = {
+        updateData.avatar = {
           public_id: myCloud.public_id,
           url: myCloud.secure_url,
         };
       }
 
-      // if (name) {
-      //   const isNameExist = await ProductModel.findOne({ name });
-      //   if (isNameExist) {
-      //     return next(new ErrorHandler("Name Product already exists", 400));
-      //   }
-      // }
+      if (code) {
+        const isCodeExist = await ProductModel.findOne({ code });
+        if (isCodeExist) {
+          return next(new ErrorHandler('Code already exists', 400));
+        } else {
+          updateData.code = code;
+        }
+      }
 
-      if (!categoryId) {
-        return next(new ErrorHandler("Plase chonse category product", 400));
+      if (name) {
+        const isNameExist = await ProductModel.findOne({ name });
+        if (isNameExist) {
+          return next(new ErrorHandler('Name Product already exists', 400));
+        } else {
+          updateData.name = name;
+        }
+      }
+
+      if (categoryId) {
+        updateData.category = categoryId;
+      } else {
+        return next(new ErrorHandler('Please choose category product', 400));
       }
 
       const product = await ProductModel.findByIdAndUpdate(
         ProductId,
-        { $set: data },
+        { $set: updateData },
         { new: true }
       );
 
-      res.status(201).json({
-        success: true,
-        product,
-      });
+      res.status(201).json({ success: true, product });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -110,6 +116,7 @@ interface QueryParams {
   keyword?: string;
   limit?: string;
   page?: string;
+  code?:string,
   sort?: "asc" | "desc";
   date?: any;
   month?: any;
@@ -126,60 +133,66 @@ export const getAllProduct = CatchAsyncError(
   ) => {
     const {
       keyword,
-      sort = "desc",
-      page = "1",
+      code,
+      sort = 'desc',
+      page = '1',
       date,
       month,
       year,
       price,
       quantity,
     } = req.query;
-
     let limit: any = req.query.limit;
     let query = ProductModel.find();
 
     // Keyword
     if (keyword) {
-      query = query.find({ name: { $regex: keyword, $options: "i" } });
+      query = query.find({ name: { $regex: keyword, $options: 'i' } });
     }
+
+    // Code
+    if (code) {
+      query = query.find({ code: { $regex: code, $options: 'i' } });
+    }
+
     // Tìm kiếm theo mốc thời gian chỉ định
     if (date || month || year) {
       const createdAtQuery: any = {};
-
       if (date) {
         createdAtQuery.$gte = new Date(date as string);
         createdAtQuery.$lt = new Date(
           new Date(createdAtQuery.$gte).getTime() + 24 * 60 * 60 * 1000
         );
       }
-
       if (month) {
         const monthNumber = parseInt(month as string, 10) - 1;
         const year = new Date().getFullYear();
         createdAtQuery.$gte = new Date(year, monthNumber, 1);
         createdAtQuery.$lt = new Date(year, monthNumber + 1, 1);
       }
-
       if (year) {
         createdAtQuery.$gte = new Date(parseInt(year as string, 10), 0, 1);
-        createdAtQuery.$lt = new Date(parseInt(year as string, 10) + 1, 0, 1);
+        createdAtQuery.$lt = new Date(
+          parseInt(year as string, 10) + 1,
+          0,
+          1
+        );
       }
-
       query = query.find({ createdAt: createdAtQuery });
     }
 
     // Sort
-    let sortCriteria = "-createdAt";
-    if (sort === "asc") {
-      sortCriteria = "createdAt";
-    } else if (price === "asc") {
-      sortCriteria = "price";
-    } else if (price === "desc") {
-      sortCriteria = "-price";
-    } else if (quantity === "asc") {
-      sortCriteria = "quantity";
-    } else if (quantity === "desc") {
-      sortCriteria = "-quantity";
+    let sortCriteria = '-createdAt';
+    if (sort === 'asc') {
+      sortCriteria = 'createdAt';
+    } else if (price === 'asc') {
+      sortCriteria = 'price';
+    } else if (price === 'desc') {
+      sortCriteria = '-price';
+    } else if (quantity === 'asc') {
+      sortCriteria = 'quantity';
+    } else if (quantity === 'desc') {
+      sortCriteria = '-quantity';
     }
     query = query.sort(sortCriteria);
 
@@ -188,13 +201,9 @@ export const getAllProduct = CatchAsyncError(
       if (!isNaN(limit) && limit > 0) {
         const pageAsNumber = parseInt(page, 10) || 1;
         const skip = (pageAsNumber - 1) * limit;
-
         const totalData = await ProductModel.countDocuments(query.getFilter());
-
         query = query.skip(skip).limit(limit);
-
         const products = await query;
-
         return res.status(200).json({
           success: true,
           count: products.length,
@@ -207,14 +216,24 @@ export const getAllProduct = CatchAsyncError(
 
     // Nếu không có limit, trả về tất cả dữ liệu
     const product = await query;
-    res.status(200).json({
-      success: true,
-      count: product.length,
-      product,
-    });
+    const productSchema = ProductModel.schema.paths;
+    const hasCodeField = productSchema.hasOwnProperty('code');
+
+    if (!hasCodeField) {
+      const productsWithDefaultCode = product.map((p) => ({
+        ...p.toObject(),
+        code: '',
+      }));
+      res.status(200).json({
+        success: true,
+        count: productsWithDefaultCode.length,
+        product: productsWithDefaultCode,
+      });
+    } else {
+      res.status(200).json({ success: true, count: product.length, product });
+    }
   }
 );
-
 // get one Product by ID
 export const getProductById = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -225,7 +244,6 @@ export const getProductById = CatchAsyncError(
       if (!Product) {
         return next(new ErrorHandler("Product not found", 404));
       }
-
       res.status(200).json({
         success: true,
         Product,
