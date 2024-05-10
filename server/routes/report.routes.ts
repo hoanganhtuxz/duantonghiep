@@ -4,7 +4,7 @@ import express from "express";
 
 export const reportRoute = express.Router();
 
-reportRoute.post(
+reportRoute.get(
   "/report",
   isAutheticated,
   authorieRoles("admin", "management"),
