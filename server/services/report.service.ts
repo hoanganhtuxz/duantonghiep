@@ -22,10 +22,10 @@ export const createReportHandler = async (payload: ICreateReport[], options: IOp
 
   const payloadGroupByWarehouseId = payload.reduce((rs, item) => {
     const isExisted = rs.findIndex((itm) => itm.warehouseId?.toString() === item.warehouseId?.toString());
-    if (isExisted) {
+    if (isExisted !== -1) {
       rs[isExisted].quantity += item.quantity;
     } else rs.push(item);
-    
+
     return rs;
   }, []);
 

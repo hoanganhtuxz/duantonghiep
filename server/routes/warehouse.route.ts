@@ -38,11 +38,18 @@ warehouseRouter.post(
     authorieRoles("admin", "management"),
     deleteProductById
   );
+
   warehouseRouter.post('/import-product',
     isAutheticated,
     authorieRoles('user','admin','management'),
     importProductController
   )
+
+  warehouseRouter.post('/export-product',
+  isAutheticated,
+  authorieRoles('user','admin','management'),
+  importProductController
+)
   
 
 export default warehouseRouter;
