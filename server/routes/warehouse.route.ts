@@ -1,6 +1,6 @@
 import express from "express";
 import { authorieRoles, isAutheticated } from "../middieware/auth";
-import { getAllProduct, uploadProduct ,deleteProductById, editProduct} from "../controller/warehouse.controller";
+import { getAllProduct, uploadProduct ,deleteProductById, editProduct, importProductController} from "../controller/warehouse.controller";
 
 
 export const warehouseRouter = express.Router()
@@ -38,6 +38,11 @@ warehouseRouter.post(
     authorieRoles("admin", "management"),
     deleteProductById
   );
+  warehouseRouter.post('/import-product',
+    isAutheticated,
+    authorieRoles('user','admin','management'),
+    importProductController
+  )
   
 
 export default warehouseRouter;
