@@ -5,7 +5,7 @@ import { CatchAsyncError } from "../middieware/catchAsyncError";
 import ProductModel from "../models/warehouse.model";
 import { createProduct } from "../services/warehouse.service";
 import { createReportHandler } from "../services/report.service";
-import { REPORT_IMPORT_PRODUCT } from "../utils/constants";
+import { REPORT_EXPORT_PRODUCT, REPORT_IMPORT_PRODUCT } from "../utils/constants";
 
 ///  interface  Product
 
@@ -292,7 +292,7 @@ const validateImportProduct = (payload: any[]) => {
       break;
     }
 
-    if (!Number(item.quantity)) {
+    if (!Number(item.quantity) || !Number.isInteger(item.quantity) || Number(item.quantity) <= 0) {
       result = `Invalid quantity of product ${item.code} (${idx}).`
       break;
     }
@@ -348,10 +348,99 @@ export const importProductController = CatchAsyncError(async (req: Request, res:
     });
   }));
 
-  // không cần await vì cho nó chạy ngầm để tăng thời gian response
+  // không cần await vì cho nó chạy ngầm để giảm thời gian response
   createReportHandler(payloadCreateImportReport, { type: REPORT_IMPORT_PRODUCT })
   return res.status(200).json({
     success: true,
     message: 'Import product successfully.'
+  })
+});
+
+const validateExportProduct = (payload: any[]) => {
+  let result = '';
+  for (let idx = 0; idx < payload.length; idx += 1) {
+    const item = payload[idx]
+    if (!item || typeof item !== 'object' || !Object.keys(item).length) {
+      result = `Invalid payload (${idx}).`;
+      break;
+    }
+
+    if (!item.code) {
+      result = `Invalid product code (${idx}).`;
+      break;
+    }
+
+    if (!Number(item.quantity) || !Number.isInteger(item.quantity) || Number(item.quantity) <= 0) {
+      result = `Invalid quantity of product ${item.code} (${idx}).`
+      break;
+    }
+  }
+
+  return result;
+}
+
+export const exportProductController = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const payload: any[] = req.body;
+
+  if (!payload.length) {
+    return next(new ErrorHandler('Invalid payload.', 400))
+  }
+
+  const hasErrorMsg = validateExportProduct(payload);
+
+  if (hasErrorMsg) {
+    return next(new ErrorHandler(hasErrorMsg, 400))
+  }
+
+  const countByCode = await ProductModel.countDocuments({ code: { $in: payload.map((i) => i.code) }})
+  if (countByCode !== payload.length) {
+    return next(new ErrorHandler('Some product could not found. Please check again.', 400))
+  }
+
+  const payloadCreateExportReport = [];
+  const productsNotUpdate = [];
+
+  await Promise.all(payload.map(async (item: any) => {
+    const productUpdated = await ProductModel.findOneAndUpdate(
+      { code: item.code, quantity: { $gte: Number(item.quantity) } },
+      [{
+        $set: {
+          quantity: {
+            $subtract: ['$quantity', Number(item.quantity)]
+          }
+        }
+      }],
+      { new: true }
+    );
+
+    if (!productUpdated) {
+      productsNotUpdate.push(item.code);
+      return;
+    }
+
+    payloadCreateExportReport.push({
+      warehouseId: productUpdated._id,
+      quantity: Number(item.quantity),
+    });
+  }));
+
+  if (payloadCreateExportReport.length) {
+    // không cần await vì cho nó chạy ngầm để giảm thời gian response
+    createReportHandler(payloadCreateExportReport, { type: REPORT_EXPORT_PRODUCT })
+  } else {
+    return next(new ErrorHandler('No product has been exported.', 400))
+  }
+
+  if (productsNotUpdate.length) {
+    return res.status(200).json({
+      success: true,
+      message: `Export product successfully. But there are a few products that cannot be exported, please check the following product codes: ${productsNotUpdate.join(', ')}.`,
+      data: productsNotUpdate
+    })
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'Export product successfully.'
   })
 })
