@@ -66,10 +66,15 @@ const EditCategoryModal = ({ id_dell, data }) => {
         onCancel={handleCancel}
         width={700}
         footer={[
-          <Button onClick={() => setVisible(false)} htmlType="button">
+          <Button
+            key="close"
+            onClick={() => setVisible(false)}
+            htmlType="button"
+          >
             Huỷ
           </Button>,
           <Button
+            key="save"
             loading={loading}
             form="add-cate"
             className="bg-blue-500 "
@@ -119,6 +124,23 @@ const EditCategoryModal = ({ id_dell, data }) => {
                 className="w-full"
                 min={0}
                 placeholder="Nhập tên"
+              />
+            </Form.Item>
+            <Form.Item
+              name="category"
+              label="Chọn danh mục"
+              rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
+            >
+              <Select
+                showSearch
+                placeholder="Chọn danh mục"
+                filterOption={filterOption}
+                options={
+                  categoris?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
               />
             </Form.Item>
             <Form.Item

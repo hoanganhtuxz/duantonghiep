@@ -4,13 +4,16 @@ import { InboxOutlined } from "@ant-design/icons";
 import { Upload, Form, Select, message, Button, Space } from "antd";
 import axiosClient from "@/service/axiosConfig";
 import { GrDownload } from "react-icons/gr";
+import { useRouter } from "next/navigation";
 
 const { Dragger } = Upload;
 
 const UploadFileProduct = () => {
   const [listChonseProduct, setListChonseProducts] = useState([]);
   const [products, setProducts] = useState(null);
-
+  const [form] = Form.useForm();
+  // const router = useRouter()
+  const [fileList, setFileList] = useState([]);
   const getListProducts = async () => {
     try {
       const response = await axiosClient.get(`/v1/products`, {
@@ -34,6 +37,25 @@ const UploadFileProduct = () => {
       }
     }
   };
+  const readExcelFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        resolve(jsonData);
+      };
+      reader.onerror = (e) => reject(e);
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const handleChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
 
   const exportToExcel = () => {
     const workbook = XLSX.utils.book_new();
@@ -43,7 +65,7 @@ const UploadFileProduct = () => {
         item.name,
         item.quantity,
         item.price,
-        item.code || '',
+        item.code || "",
       ]),
     ];
 
@@ -70,7 +92,59 @@ const UploadFileProduct = () => {
     downloadLink.click();
   };
 
-  const uploadProduct = () => {};
+  const uploadProduct = async () => {
+    const key = "import-file";
+    message.open({
+      key,
+      type: "loading",
+      content: "Đang tải...",
+    });
+    const fileData = [];
+    const dataImport = await readExcelFile(fileList[0].originFileObj);
+
+    fileData.push(
+      ...dataImport.map((item) => ({
+        code: item["Mã code"] || "",
+        quantity: item["Số lượng"] || "1",
+        price: item["Giá"] || "",
+        name: item["Tên sản phẩm"] || "",
+      }))
+    );
+
+    try {
+      const res = await axiosClient.post(`v1/import-product`, fileData, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        message.open({
+          key,
+          type: "success",
+          content: "Nhập kho thành công!",
+          duration: 2,
+        });
+        setVisible(false);
+        form.resetFields();
+        setLoading(false);
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.open({
+          key,
+          type: "error",
+          content: error?.response?.data?.message,
+          duration: 2,
+        });
+      } else {
+        message.open({
+          key,
+          type: "error",
+          content: "Không thể nhập kho với file xlsx",
+          duration: 2,
+        });
+      }
+    }
+  };
 
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
@@ -84,10 +158,31 @@ const UploadFileProduct = () => {
       return [...prev, ...newProducts];
     });
   };
-  console.log("listChonseProduct", listChonseProduct);
+
   useEffect(() => {
     getListProducts();
   }, []);
+
+  const uploadProps = {
+    name: "file",
+    maxCount: 1,
+    multiple: false,
+    fileList,
+    onChange: handleChange,
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        message.error("File phải nhỏ hơn 2MB!");
+      }
+      return false;
+    },
+  };
 
   return (
     <div>
@@ -124,7 +219,7 @@ const UploadFileProduct = () => {
         </Form.Item>
       </div>
       <div>Tải file Excel</div>
-      <Dragger multiple={false}>
+      <Dragger accept=".xlsx" {...uploadProps} multiple={false}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>

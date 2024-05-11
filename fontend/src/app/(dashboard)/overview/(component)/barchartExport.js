@@ -5,7 +5,7 @@ import ReactApexChart from "react-apexcharts";
 const ApexBarChart = ({ setQueryReport, dataChart }) => {
   const [series, setSeries] = useState([
     {
-      name: "Nhập kho",
+      name: "Xuất kho",
       data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
     },
   ]);
@@ -29,6 +29,7 @@ const ApexBarChart = ({ setQueryReport, dataChart }) => {
       width: 2,
       colors: ["transparent"],
     },
+    colors: ["#90ee7e"],
     xaxis: {
       categories: [
         "12/2/2023",
@@ -58,8 +59,6 @@ const ApexBarChart = ({ setQueryReport, dataChart }) => {
       },
     },
   });
-
-
 
   return (
     <div>
