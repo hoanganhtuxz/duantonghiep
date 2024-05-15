@@ -1,6 +1,6 @@
 import express from "express";
 import { authorieRoles, isAutheticated } from "../middieware/auth";
-import { getAllProduct, uploadProduct ,deleteProductById, editProduct, getStatisticProduct} from "../controller/warehouse.controller";
+import { getAllProduct, uploadProduct ,deleteProductById, editProduct, getStatisticProduct, importProductController, exportProductController} from "../controller/warehouse.controller";
 
 
 export const warehouseRouter = express.Router()
