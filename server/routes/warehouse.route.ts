@@ -1,6 +1,6 @@
 import express from "express";
 import { authorieRoles, isAutheticated } from "../middieware/auth";
-import { getAllProduct, uploadProduct ,deleteProductById, editProduct, importProductController} from "../controller/warehouse.controller";
+import { getAllProduct, uploadProduct ,deleteProductById, editProduct, importProductController, exportProductController} from "../controller/warehouse.controller";
 
 
 export const warehouseRouter = express.Router()
@@ -48,7 +48,7 @@ warehouseRouter.post(
   warehouseRouter.post('/export-product',
   isAutheticated,
   authorieRoles('user','admin','management'),
-  importProductController
+  exportProductController
 )
   
 

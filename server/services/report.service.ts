@@ -17,7 +17,7 @@ export const createReportHandler = async (payload: ICreateReport[], options: IOp
   now.setMinutes(0);
   now.setSeconds(0);
   now.setMilliseconds(0);
-  const dateStr = now.toString().split('T')[0];
+  const dateStr = now.toISOString().split('T')[0];
   const timestamp = now.getTime();
 
   const payloadGroupByWarehouseId = payload.reduce((rs, item) => {
@@ -40,13 +40,15 @@ export const createReportHandler = async (payload: ICreateReport[], options: IOp
     if (hasExisted) {
       await ReportModel.updateOne(
         { _id: hasExisted._id },
-        {
-          $set: {
-            quantity: {
-              $sum: [item.quantity, '$quantity']
+        [
+          {
+            $set: {
+              quantity: {
+                $sum: [item.quantity, '$quantity']
+              }
             }
           }
-        }
+        ]
       )
     } else {
       await ReportModel.create({
