@@ -46,11 +46,13 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
   if (process.env.NODE_ENV === "production") {
     accessTokenOptions.secure = true;
   }
+
+  const { password, ...userInfo } = user;
   res.cookie("access_token", accessToken, accessTokenOptions);
   res.cookie("refresh_token", refreshToken, refreshTokenOptions);
   res.status(statusCode).json({
     success: true,
-    user,
+    user: userInfo,
     accessToken,
   });
 };
