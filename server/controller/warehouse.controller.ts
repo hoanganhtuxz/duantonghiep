@@ -125,6 +125,8 @@ interface QueryParams {
   year?: any;
   price?: "asc" | "desc";
   quantity?: "asc" | "desc";
+  orderBy?: "asc" | "desc";
+  sorter?: string;
 }
 
 export const getAllProduct = CatchAsyncError(
@@ -236,6 +238,105 @@ export const getAllProduct = CatchAsyncError(
     }
   }
 );
+
+const getSortString = (sorter: string, orderBy = 'desc') => {
+  let result = `-${sorter}`;
+  if (orderBy === 'asc') result = sorter;
+  return result;
+}
+
+export const getStatisticProduct = CatchAsyncError(async (
+  req: Request<any, any, any, QueryParams>,
+  res: Response,
+) => {
+  const {
+    keyword,
+    orderBy = 'desc',
+    sorter = 'createdAt',
+    page = 1,
+    limit = 10,
+    date,
+    month,
+    year,
+  } = req.query;
+
+  const condition = {}
+
+  if (keyword) {
+    Object.assign(condition, {
+      $or: [
+        { name: { $regex: keyword, $options: 'i' } },
+        { code: { $regex: keyword, $options: 'i' } }
+      ]
+    })
+  }
+
+  // Tìm kiếm theo mốc thời gian chỉ định
+  if (date || month || year) {
+    const createdAtQuery: any = {};
+    if (date) {
+      createdAtQuery.$gte = new Date(date as string);
+      createdAtQuery.$lt = new Date(
+        new Date(createdAtQuery.$gte).getTime() + 24 * 60 * 60 * 1000
+      );
+    }
+    if (month) {
+      const monthNumber = parseInt(month as string, 10) - 1;
+      const year = new Date().getFullYear();
+      createdAtQuery.$gte = new Date(year, monthNumber, 1);
+      createdAtQuery.$lt = new Date(year, monthNumber + 1, 1);
+    }
+    if (year) {
+      createdAtQuery.$gte = new Date(parseInt(year as string, 10), 0, 1);
+      createdAtQuery.$lt = new Date(
+        parseInt(year as string, 10) + 1,
+        0,
+        1
+      );
+    }
+
+    Object.assign(condition, { createdAt: createdAtQuery })
+  }
+
+  // Nếu không có limit, trả về tất cả dữ liệu
+  const [product, count] = await Promise.all(['data', 'count'].map(async (key) => {
+    if (key === 'data') {
+      const newLimit = Number(limit) || 10;
+      const skip = newLimit * ((Number(page) || 1) - 1)
+      const productResult = await ProductModel.find(condition)
+        .sort(getSortString(sorter, orderBy))
+        .limit(newLimit)
+        .skip(skip)
+        .populate({
+          path: 'classification',
+          select: 'name description'
+        })
+        .populate({
+          path: 'condition',
+          select: 'name description'
+        })
+        .populate({
+          path: 'category',
+          select: 'name description avatar'
+        })
+        .populate({
+          path: 'status',
+          select: 'name description'
+        })
+        .lean();
+      return productResult;
+    } else if (key === 'count') {
+      return await ProductModel.countDocuments(condition);
+    }
+  }))
+
+  return res.status(200).json({
+    success: true,
+    count,
+    product,
+  });
+})
+
 // get one Product by ID
 export const getProductById = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

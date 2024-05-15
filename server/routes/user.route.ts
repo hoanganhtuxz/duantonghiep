@@ -28,9 +28,10 @@ userRouter.post("/social-auth", socialAuth);
 userRouter.put("/user", isAutheticated, updateUserInfor);
 userRouter.put("/update-password", isAutheticated, updatePassword);
 userRouter.put("/update-avatar", isAutheticated, updateProfileAvatar);
-userRouter.get("/accounts", getAllUser, authorieRoles("admin"));
-userRouter.post("/accounts", uploadUser, authorieRoles("admin"));
-userRouter.put("/accounts/:id", editUser, authorieRoles("admin"));
-userRouter.delete("/accounts/:id", deleteUserById, authorieRoles("admin"));
+
+userRouter.get("/accounts", isAutheticated, authorieRoles("admin"), getAllUser);
+userRouter.post("/accounts", isAutheticated, authorieRoles("admin"), uploadUser);
+userRouter.put("/accounts/:id", isAutheticated, authorieRoles("admin"), editUser);
+userRouter.delete("/accounts/:id", isAutheticated, authorieRoles("admin"), deleteUserById);
 
 export default userRouter;
