@@ -21,6 +21,7 @@ const warehouseSchema: Schema = new mongoose.Schema(
   {
     name: {
       type: String,
+      index:true,
       required: [true, "Please enter the product name"],
     },
     description: {
@@ -29,15 +30,18 @@ const warehouseSchema: Schema = new mongoose.Schema(
     },
     quantity: {
       type: Number,
+      index:true,
       required: [false, "Please enter the product quantity"],
     },
     price: {
       type: Number,
+      index:true,
       required: [false, "Please enter the product price"],
     },
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
+      index:true,
       required: [false, "Please enter the product category"],
     },
     code: {
@@ -49,16 +53,19 @@ const warehouseSchema: Schema = new mongoose.Schema(
     status: {
       type: Schema.Types.ObjectId,
       ref: "Status",
+      index:true,
       required: [false, "Please enter the product status"],
     },
     classification: {
       type: Schema.Types.ObjectId,
       ref: "Classification",
+      index:true,
       required: [false, "Please enter the product classification"],
     },
     condition: {
       type: Schema.Types.ObjectId,
       ref: "Condition",
+      index:true,
       required: [false, "Please enter the product condition"],
     },
 
