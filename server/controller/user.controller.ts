@@ -226,9 +226,16 @@ export const getUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-      getUserById(userId, res);
+      const userInfo = await getUserById(userId, res);
+
+      if (userInfo) {
+        return res.status(201).json({
+          success: true,
+          user: userInfo,
+        });
+      } else throw new Error('Unauthorized')
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message || 'Unauthorized', 401));
     }
   }
 );

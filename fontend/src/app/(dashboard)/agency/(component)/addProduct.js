@@ -57,10 +57,15 @@ const AddProductModal = () => {
         onCancel={handleCancel}
         width={700}
         footer={[
-          <Button onClick={() => setVisible(false)} htmlType="button">
+          <Button
+            key="close"
+            onClick={() => setVisible(false)}
+            htmlType="button"
+          >
             Huỷ
           </Button>,
           <Button
+            key="sve"
             loading={loading}
             form="add-cate"
             className="bg-blue-500 "
@@ -120,6 +125,76 @@ const AddProductModal = () => {
               <Select
                 showSearch
                 placeholder="Chọn danh mục"
+                filterOption={filterOption}
+                options={
+                  categoris?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="category"
+              label="Chọn danh mục"
+              rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
+            >
+              <Select
+                showSearch
+                placeholder="Chọn danh mục"
+                filterOption={filterOption}
+                options={
+                  categoris?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="status"
+              label="Chọn trạng thái"
+              rules={[{ required: true, message: "Vui chọn trạng thái!" }]}
+            >
+              <Select
+                showSearch
+                placeholder="Chọn trạng thái"
+                filterOption={filterOption}
+                options={
+                  categoris?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="classifcation"
+              label="Chọn phân loại"
+              rules={[{ required: true, message: "Vui chọn phân loại!" }]}
+            >
+              <Select
+                showSearch
+                placeholder="Chọn trạng thái"
+                filterOption={filterOption}
+                options={
+                  categoris?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="condition"
+              label="Chọn tình trạng"
+              rules={[{ required: true, message: "Vui chọn phân loại!" }]}
+            >
+              <Select
+                showSearch
+                placeholder="Chọn trạng thái"
                 filterOption={filterOption}
                 options={
                   categoris?.map((i) => ({
