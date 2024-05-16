@@ -25,6 +25,7 @@ import { CiShoppingTag } from "react-icons/ci";
 import { logoutUser } from "@/service/auth";
 import { VscGroupByRefType } from "react-icons/vsc";
 import { LiaPercentageSolid } from "react-icons/lia";
+import ModalProfile from "./(component)/ModalProfile";
 
 const { Header, Sider, Content } = Layout;
 
@@ -91,6 +92,7 @@ export default function DashboardLayout({
   const userInfo = useRecoilValue(userInfoSelector);
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
+  const [visible, setVisible] = useState(false);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -104,7 +106,7 @@ export default function DashboardLayout({
       localStorage.removeItem("userInfo");
       router.push("/login");
     } else if (e.key === "editProfile") {
-      // Xử lý logic chỉnh sửa thông tin
+      setVisible(true);
     }
   };
 
@@ -151,9 +153,7 @@ export default function DashboardLayout({
         <div className="demo-logo-vertical h-[64px] border-b pl-7 pt-4">
           <Space>
             <MdHomeWork className="text-xl text-blue-800" />
-            <h3 className="font-semibold text-xl  text-blue-700">
-              Interior
-            </h3>
+            <h3 className="font-semibold text-xl  text-blue-700">Interior</h3>
           </Space>
         </div>
         <Menu
@@ -214,6 +214,8 @@ export default function DashboardLayout({
           <Suspense fallback={<Loading />}>{children}</Suspense>
         </Content>
       </Layout>
+
+      {visible && <ModalProfile visible={visible} setVisible={setVisible} />}
     </Layout>
   );
 }
