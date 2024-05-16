@@ -1,9 +1,13 @@
 "use client";
 
+import { userInfoSelector } from "@/atom";
 import { Modal, Upload } from "antd";
 import React from "react";
+import { useRecoilValue } from "recoil";
 
 const ModalProfile = ({ visible, setVisible }) => {
+  const userInfo = useRecoilValue(userInfoSelector);
+  console.log(userInfo);
   return (
     <Modal
       title="Thông tin tài khoản"
@@ -11,13 +15,13 @@ const ModalProfile = ({ visible, setVisible }) => {
       onCancel={() => setVisible(false)}
       width={700}
     >
-      <div className="mt-6">
+      <div className="mt-8">
         <div class="flex items-center justify-center ">
           <label
             for="dropzone-file"
-            class="flex flex-col items-center justify-center w-[200px] h-[200px] rounded-[50%] overflow-hidden border-2 border-gray-300 border-dashed  cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            class="group flex flex-col items-center justify-center w-[200px] h-[200px] rounded-[50%] overflow-hidden border-2 border-gray-300 border-dashed  cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
           >
-            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <div class="opacity-0 group-hover:opacity-[50]  transition-all decoration-slate-200 flex flex-col items-center justify-center pt-5 pb-6">
               <svg
                 class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
                 aria-hidden="true"
@@ -39,6 +43,9 @@ const ModalProfile = ({ visible, setVisible }) => {
             </div>
             <input id="dropzone-file" type="file" class="hidden" />
           </label>
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between"></div>
         </div>
       </div>
     </Modal>
