@@ -47,7 +47,7 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
     accessTokenOptions.secure = true;
   }
 
-  const { password, ...userInfo } = user;
+  const { password, ...userInfo } = user._doc || user._docs || user;
   res.cookie("access_token", accessToken, accessTokenOptions);
   res.cookie("refresh_token", refreshToken, refreshTokenOptions);
   res.status(statusCode).json({
