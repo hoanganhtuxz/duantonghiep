@@ -55,14 +55,14 @@ const ModalProfile = ({ visible, setVisible }) => {
           <div className="py-[6px] px-[16px] rounded-[4px] bg-gray-100 min-h-[44px] flex items-center">
             <div className="flex justify-between items-center">
               <div className="text-[16px]">
-                User Name: <span className="font-bold">{userInfo?.name}</span>
+                Email: <span className="font-medium">{userInfo?.email}</span>
               </div>
             </div>
           </div>
           <div className="py-[6px] min-h-[44px] px-[16px] rounded-[4px] bg-gray-100">
             <div className="flex justify-between items-center">
               <div className="text-[16px]">
-                Email: <span className="font-medium">{userInfo?.email}</span>
+                Tài khoản: <span className="font-medium">{userInfo?.name}</span>
               </div>
               <span
                 className="w-[32px] h-[32px] rounded-[4px] bg-blue-400 flex justify-center items-center cursor-pointer"
@@ -77,14 +77,17 @@ const ModalProfile = ({ visible, setVisible }) => {
               <div className="mt-[16px]">
                 <Form layout="vertical">
                   <Form.Item
-                    name="email"
-                    label="Chỉnh sửa email"
+                    name="username"
+                    label="Chỉnh sửa tên tài khoản"
                     required={false}
                     rules={[
-                      { required: true, message: "Vui lòng nhập email!" },
+                      {
+                        required: true,
+                        message: "Vui lòng nhập trường này!",
+                      },
                     ]}
                   >
-                    <Input placeholder="@gmail" />
+                    <Input placeholder="Tên tài khoản" />
                   </Form.Item>
                   <Button
                     // loading={loading}
@@ -102,7 +105,7 @@ const ModalProfile = ({ visible, setVisible }) => {
           <div className="py-[6px] min-h-[44px] px-[16px] rounded-[4px] bg-gray-100">
             <div className="flex justify-between items-center">
               <div className="text-[16px]">
-                Password: <span className="font-medium">********</span>
+                Mật khẩu: <span className="font-medium">********</span>
               </div>
               <span
                 className="w-[32px] h-[32px] rounded-[4px] bg-blue-400 flex justify-center items-center cursor-pointer"
