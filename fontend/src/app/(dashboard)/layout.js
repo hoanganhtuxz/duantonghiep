@@ -92,7 +92,7 @@ export default function DashboardLayout({
   const userInfo = useRecoilValue(userInfoSelector);
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
