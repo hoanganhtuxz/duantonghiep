@@ -13,10 +13,10 @@ interface IOptionCreateReport {
 
 export const createReportHandler = async (payload: ICreateReport[], options: IOptionCreateReport) => {
   const now = new Date();
-  now.setHours(10);
+  now.setHours(0);
   now.setMinutes(0);
   now.setSeconds(0);
-  now.setMilliseconds(0);
+  now.setMilliseconds(1);
   const dateStr = now.toISOString().split('T')[0];
   const timestamp = now.getTime();
 
