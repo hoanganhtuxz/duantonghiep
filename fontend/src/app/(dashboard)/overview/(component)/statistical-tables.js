@@ -1,142 +1,104 @@
 import React from "react";
 import { Space, Table, Tag, Select } from "antd";
+import { extractTotalQuantities, getDateRange, processData } from "@/utils";
+
 const columns = [
   {
-    title: "Tên sản phẩm",
-    dataIndex: "name",
-    key: "name",
-    render: (text) => <a>{text}</a>,
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
   },
   {
-    title: "Số lượng",
-    dataIndex: "age",
-    key: "age",
+    title: 'Quantity',
+    dataIndex: 'quantity',
+    key: 'quantity',
   },
   {
-    title: "Danh mục",
-    dataIndex: "address",
-    key: "address",
+    title: 'Price',
+    dataIndex: 'price',
+    key: 'price',
   },
   {
-    title: "Tình trạng",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
+    title: 'Category',
+    dataIndex: 'category',
+    key: 'category',
+    render: (category) => {
+      if (category && category.name) {
+        return category.name;
+      }
+      return ''; // Hoặc một giá trị mặc định khác
+    },
   },
-  {
-    title: "Phân loại",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
-const data = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"],
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sydney No. 1 Lake Park",
-    tags: ["cool", "teacher"],
-  },
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"],
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sydney No. 1 Lake Park",
-    tags: ["cool", "teacher"],
-  },
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"],
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sydney No. 1 Lake Park",
-    tags: ["cool", "teacher"],
-  },
+  // Các cột khác...
 ];
 
-const StatisticalTables = () => {
-    return(
-        <div>
-              <Space className="mb-4">
-            <p>Bộ lọc:</p>
-            <Select
-              defaultValue="lucy"
-              style={{ width: 120 }}
-              options={[
-                { value: "", label: "1 Tuần" },
-                { value: "", label: "2 Tuần" },
-                { value: "lucy", label: "1 Tháng" },
-                { value: "Yiminghe", label: "3 Tháng" },
-                { value: "disabled", label: "6 Tháng" },
-                { value: "disabled", label: "9 Tháng" },
-                { value: "disabled", label: "12 Tháng" },
-              ]}
-            />
-          </Space>
-          <Table columns={columns} dataSource={data} />;
-        </div>
-    )
+
+const StatisticalTables = ({ dataStatic, setQueryTable }) => {
+
+  const handleOptionChange = (value) => {
+    const { startDate, endDate } = getDateRange(value);
+    if (!startDate || !endDate) {
+      console.error("Invalid date range");
+      return;
+    }
     
-}
+    const query = {
+      page: 1,
+      limit: 10,
+      groupBy: 'date',
+    };
+    
+    if (value === '1w' || value === '2w') {
+      query.date = endDate.toISOString().split('T')[0];
+    } else {
+      const startMonth = startDate.getMonth() + 1;
+      const endMonth = endDate.getMonth() + 1;
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
+      
+      if (startYear === endYear) {
+        if (startMonth === endMonth) {
+          query.month = startMonth;
+          query.year = startYear;
+        } else {
+          query.startMonth = startMonth;
+          query.endMonth = endMonth;
+          query.year = startYear;
+        }
+      } else {
+        query.startYear = startYear;
+        query.endYear = endYear;
+      }
+    }
+    
+    const queryString = new URLSearchParams(query).toString();
+    setQueryTable(queryString)
+  };
+
+  console.log('dataStatic',dataStatic)
+
+  return (
+    <div>
+      <Space className="mb-4">
+        <p>Bộ lọc:</p>
+        <Select
+          defaultValue="1w"
+          onChange={handleOptionChange}
+          style={{ width: 120 }}
+          options={[
+            { value: "1w", label: "1 Tuần" },
+            { value: "2w", label: "2 Tuần" },
+            { value: "1m", label: "1 Tháng" },
+            { value: "3m", label: "3 Tháng" },
+            { value: "6m", label: "6 Tháng" },
+            { value: "9m", label: "9 Tháng" },
+            { value: "12m", label: "12 Tháng" },
+          ]}
+        />
+      </Space>
+      <Table columns={columns} dataSource={dataStatic?.data || []} />
+    </div>
+  );
+};
 
 export default StatisticalTables;

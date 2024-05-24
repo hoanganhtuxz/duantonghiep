@@ -13,6 +13,14 @@ export default function Page() {
     startDate: getDefaultStartDate("1w"),
     endDate: getDefaultEndDate("1w"),
   });
+  const [queryReport2, setQueryReport2] = useState({
+    startDate: getDefaultStartDate("1w"),
+    endDate: getDefaultEndDate("1w"),
+  });
+  const [queryTable, setQueryTable] = useState({  page: 1,
+    limit: 10,
+    groupBy: 'date',
+    date: new Date().toISOString().split('T')[0],});
 
   const [dataChart, setDataChart] = useState({
     total: 0,
@@ -25,6 +33,12 @@ export default function Page() {
     data: null,
     pageIndex: 0,
   });
+
+  const [dataStatic, setDataStatic] = useState({
+    total: 0,
+    data: null,
+  });
+
 
   const fetchImport = async (query) => {
     try {
@@ -76,11 +90,49 @@ export default function Page() {
     const { startDate, endDate } = queryReport;
     if (startDate && endDate) {
       const query = `?type=import_product&startDate=${startDate}&endDate=${endDate}&groupBy=date&totalItem=7`;
-      const valueExport = `?type=export_product&startDate=${startDate}&endDate=${endDate}&groupBy=date&totalItem=7`;
       fetchImport(query);
-      fetchExport(valueExport);
     }
   }, [queryReport]);
+  
+  useEffect(() => {
+    const { startDate, endDate } = queryReport2;
+    if (startDate && endDate) {
+      const valueExport = `?type=export_product&startDate=${startDate}&endDate=${endDate}&groupBy=date&totalItem=7`;
+      fetchExport(valueExport);
+    }
+  }, [queryReport2]);
+
+
+  const fetchStaticProduct = async (query) => {
+    try {
+      const response = await axiosClient.get(`/v1/statistic-products${query}`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setDataStatic({
+          total: response.data.product?.length,
+          data: response.data?.product,
+        });
+      } else {
+        message.error("Failed to fetch faild");
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching faild");
+      }
+    }
+  };
+
+
+
+
+  useEffect(() => {
+      fetchStaticProduct(`?${new URLSearchParams(queryTable).toString()}`);
+  }, [queryTable]);
+
+
 
   return (
     <div>
@@ -97,13 +149,14 @@ export default function Page() {
         Biểu đồ thống kê xuất kho
       </div>
       <ApexBarChart
+      showFilter
         dataChart={dataChart2}
         type="import"
         colorChart="#90ee7e"
-        setQueryReport={setQueryReport}
+        setQueryReport={setQueryReport2}
       />
       <div className="text-md font-bold mb-4">Bảng thống kê sản phẩm</div>
-      <StatisticalTables />
+      <StatisticalTables dataStatic={dataStatic} setQueryTable={setQueryTable} />
     </div>
   );
 }

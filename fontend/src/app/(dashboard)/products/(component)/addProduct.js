@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, Input, message, Select, InputNumber } from "antd";
 import axiosClient from "@/service/axiosConfig";
 import { useRecoilState } from "recoil";
@@ -11,7 +11,11 @@ const AddProductModal = () => {
   const [loading, setLoading] = useState(false);
   const [categoris] = useRecoilState(categoryState);
   const [, setProducts] = useRecoilState(productState);
+  const [condition,setCondition] = useState([])
+  const [status,setStatus] = useState([])
+  const [classification,setClassification] = useState([])
 
+  
   const showModal = () => {
     setVisible(true);
   };
@@ -20,6 +24,61 @@ const AddProductModal = () => {
     setVisible(false);
     form.resetFields();
   };
+  
+  const fetchConditon = async () => {
+    try {
+      const response = await axiosClient.get(`/v1/condition`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setCondition(response.data.condition)
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching");
+      }
+    }
+  };
+  const fetchStatus = async () => {
+    try {
+      const response = await axiosClient.get(`/v1/status`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setStatus(response.data.status)
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching");
+      }
+    }
+  };
+  const fetchClassificaiton = async () => {
+    try {
+      const response = await axiosClient.get(`/v1/classification`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setClassification(response.data.classification)
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching");
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchConditon();
+    fetchStatus()
+    fetchClassificaiton()
+  }, []);
 
   const handleSave = async () => {
     setLoading(true);
@@ -45,6 +104,12 @@ const AddProductModal = () => {
   };
 
   const filterOption = (input, option) =>
+    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+  const filterOption2 = (input, option) =>
+    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+  const filterOption3 = (input, option) =>
+    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+  const filterOption4 = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   return (
@@ -116,7 +181,7 @@ const AddProductModal = () => {
             <Form.Item
               name="category"
               label="Chọn danh mục"
-              rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
+              // rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
             >
               <Select
                 showSearch
@@ -124,6 +189,54 @@ const AddProductModal = () => {
                 filterOption={filterOption}
                 options={
                   categoris?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="status"
+              label="Chọn trạng thái"
+            >
+              <Select
+                showSearch
+                placeholder="Chọn trạng thái"
+                filterOption={filterOption2}
+                options={
+                  status?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="condition"
+              label="Chọn phân loại"
+            >
+              <Select
+                showSearch
+                placeholder="Chọn phân loại"
+                filterOption={filterOption3}
+                options={
+                  classification?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="classification"
+              label="Chọn tình trạng"
+            >
+              <Select
+                showSearch
+                placeholder="Chọn tình trạng"
+                filterOption={filterOption4}
+                options={
+                  condition?.map((i) => ({
                     label: i.name,
                     value: i._id,
                   })) || []

@@ -20,7 +20,6 @@ const StatisticAll = () => {
         withCredentials: true,
       });
       if (response.data.success) {
-        console.log("response.data.product", response.data.product);
         const productItem = dataItem.find((item) => item.key === "product");
         if (productItem) {
           updateItemStaticValue("product", response.data.count);

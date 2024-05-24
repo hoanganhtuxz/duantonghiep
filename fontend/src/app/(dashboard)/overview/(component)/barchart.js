@@ -3,8 +3,7 @@ import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { extractTotalQuantities, getDateRange, processData } from "@/utils";
 
-const ApexBarChart = ({ setQueryReport, dataChart, dataChart2 ,colorChart ='#33b2df'}) => {
-  console.log("dataChart", dataChart);
+const ApexBarChart = ({setQueryReport, dataChart, dataChart2 ,colorChart ='#33b2df'}) => {
 
   const [series, setSeries] = useState([
     {
@@ -103,7 +102,7 @@ const ApexBarChart = ({ setQueryReport, dataChart, dataChart2 ,colorChart ='#33b
 
   return (
     <div>
-      <Space>
+       <Space>
         <p>Bộ lọc:</p>
         <Select
           defaultValue="1w"
