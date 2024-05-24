@@ -1,23 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Avatar,
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  List,
-  message,
-  Select,
-} from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Form, Input, message, Select } from "antd";
 import axiosClient from "@/service/axiosConfig";
-import NumberProductExport from "./NumberProductExport";
+import ListChonseProductExport from "./listChonseProductExport";
+import { calculateTotalPrice, formatPrice } from "@/utils";
+import { pdf } from "@react-pdf/renderer";
+import InvoicePDF from "@/components/inVoicePdf";
+import InvoiceWord from "@/components/invoiceWord";
 
 const ExportProduct = () => {
-  
-  const onFinish = (value) => {};
-
+  const [form] = Form.useForm();
   const [products, setProducts] = useState(null);
   const [listChonseProduct, setListChonseProducts] = useState([]);
+
+  const onFinish = async (values) => {
+    await handleUpdataExport(values);
+  };
 
   const getListProducts = async () => {
     try {
@@ -29,6 +26,7 @@ const ExportProduct = () => {
           ...product,
           value: product._id,
           label: product.name,
+          price: product.price,
         }));
         setProducts(newData);
       } else {
@@ -47,16 +45,78 @@ const ExportProduct = () => {
     const sortData = products?.filter((i) => i._id === value);
     setListChonseProducts((prev) => {
       if (prev.some((item) => item._id === value)) {
-        return prev;
+        return prev.map((i) => ({
+          ...i,
+          quantity: 1,
+          totalQuatity: i.quantity,
+        }));
       } else {
-        return [...prev, ...sortData];
+        const newArray = [...prev, ...sortData];
+        return newArray.map((i) => ({
+          ...i,
+          quantity: 1,
+          totalQuatity: i.quantity,
+        }));
       }
     });
+  };
+
+  const chonseQuantity = (id, newQuatity) => {
+    setListChonseProducts((prev) =>
+      prev.map((i) => (i._id === id ? { ...i, quantity: newQuatity } : i))
+    );
+  };
+
+
+  const handleUpdataExport = async (values) => {
+    const dataExport = { ...values, products: listChonseProduct };
+
+    const pauloadExport = listChonseProduct.map((product) => ({
+      code: product.code,
+      quantity: product.quantity,
+    }));
+
+    try {
+      const response = await axiosClient.post(
+        `/v1/export-product`,
+        pauloadExport,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data.success) {
+        message.success("Xuất file thành công");
+        // InvoiceWord(dataExport);
+      } 
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching export");
+      }
+    }
+  };
+
+  const handleDownloadPDF = async (dataExport) => {
+    const blob = await pdf(<InvoicePDF data={dataExport} />).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "invoice.pdf";
+    link.click();
   };
 
   const handleRemoveExportProduct = (id) => {
     setListChonseProducts((prev) => prev.filter((i) => i._id !== id));
   };
+
+  useEffect(() => {
+    const totalPrice = calculateTotalPrice(listChonseProduct || []);
+    const formattedTotalPrice = formatPrice(totalPrice || 0);
+    form.setFieldsValue({
+      price: formattedTotalPrice || 0,
+    });
+  }, [listChonseProduct, form]);
 
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
@@ -70,6 +130,7 @@ const ExportProduct = () => {
       <Form
         layout="vertical"
         name="basic"
+        form={form}
         onFinish={onFinish}
         autoComplete="off"
       >
@@ -79,71 +140,28 @@ const ExportProduct = () => {
           rules={[{ required: true, message: "Tìm kiếm sả phẩm" }]}
         >
           <Select
-            // mode="multiple"
             showSearch
             placeholder="Chọn hoặc tìm kiếm sản phẩm"
             onChange={onChange}
             filterOption={filterOption}
-            options={products || []}
-          />
+          >
+            {products?.map((product) => (
+              <Select.Option key={product._id} value={product.value}>
+                <div className="flex justify-between">
+                  <p>{product.label}</p>
+                  <p className="text-red-500">
+                    {formatPrice(product.price || 0)}
+                  </p>
+                </div>
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
-        <div>
-          <List
-            className="mb-4"
-            dataSource={listChonseProduct}
-            renderItem={(item, index) => (
-              <List.Item
-                key={index}
-                actions={[
-                  <NumberProductExport
-                    key="quantity"
-                    maxProduct={item?.quantity}
-                  />,
-                  <Button
-                    type="text"
-                    key="delete"
-                    danger
-                    onClick={() => handleRemoveExportProduct(item?._id)}
-                  >
-                    Xoá
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      size={50}
-                      shape="square"
-                      className="bg-blue-100"
-                      src={`https://static.thenounproject.com/png/4974686-200.png`}
-                    />
-                  }
-                  title={
-                    <a className="hover:text-blue-500 text-blue-500 font-medium">
-                      {item.name}
-                    </a>
-                  }
-                  description={
-                    <div>Mã code: {item?.code || " *** *** *** "}</div>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        </div>
-        {/* <Form.Item
-          label="Số lượng"
-          name="quantity"
-          rules={[{ required: true, message: "Vui lòng nhập số lượng" }]}
-        >
-          <InputNumber
-            className="w-full"
-            min={0}
-            type="number"
-            placeholder="Nhập số lượng"
-          />
-        </Form.Item> */}
-
+        <ListChonseProductExport
+          chonseQuantity={chonseQuantity}
+          handleRemoveExportProduct={handleRemoveExportProduct}
+          listChonseProduct={listChonseProduct}
+        />
         <Form.Item
           label="Người xuất kho"
           name="user"
@@ -151,12 +169,14 @@ const ExportProduct = () => {
         >
           <Input className="w-full" placeholder="Nhập tên người xuất kho" />
         </Form.Item>
-        <Form.Item
-          label="Tổng tiền"
-          name="price"
-          rules={[{ required: true, message: "Vui lòng nhập số lượng" }]}
-        >
-          <Input className="w-full" placeholder="Nhập tên người xuất kho" />
+        <Form.Item label="Tổng tiền" name="price">
+          <Input
+            className="w-full"
+            addonAfter="VNĐ"
+            value="59d"
+            disabled
+            placeholder="0đ"
+          />
         </Form.Item>
 
         <Form.Item
@@ -176,9 +196,11 @@ const ExportProduct = () => {
           />
         </Form.Item>
         <Form.Item>
-      <div className="flex justify-end">
-      <Button type="primary" htmlType="submit">Xác nhận xuất kho</Button>
-      </div>
+          <div className="flex justify-end">
+            <Button type="primary" htmlType="submit">
+              Xác nhận xuất kho
+            </Button>
+          </div>
         </Form.Item>
       </Form>
     </div>

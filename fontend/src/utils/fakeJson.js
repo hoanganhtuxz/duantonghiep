@@ -70,8 +70,42 @@ const sidebarItem = [
     label: "Tình trạng",
   },
 ];
-
-export {
-    sidebarItem,
-    menuItems
-}
+const itemStatic = [
+  { key: "product", name: "Tổng sản phẩm", value: "0" },
+  {
+    key: "account",
+    name: "Tổng tài khoản",
+    value: "0",
+  },
+  {
+    key: "category",
+    name: "Tổng  danh mục",
+    value: "0",
+  },
+  {
+    key: "classification",
+    name: "Tổng phân loại",
+    value: "0",
+  },
+  {
+    key: "status",
+    name: "Tổng trạng thái",
+    value: "0",
+  },
+  {
+    key: "max-export",
+    name: "Tổng xuất kho",
+    value: "0",
+  },
+  {
+    key: "max-import",
+    name: "Tổng nhập kho",
+    value: "0",
+  },
+  {
+    key: "condition",
+    name: "Tổng tình trạng",
+    value: "0",
+  },
+];
+export { sidebarItem, menuItems, itemStatic };

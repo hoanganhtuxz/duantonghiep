@@ -123,10 +123,10 @@ const UploadFileProduct = () => {
           content: "Nhập kho thành công!",
           duration: 2,
         });
-        setVisible(false);
         form.resetFields();
-        setLoading(false);
+        setFileList([])
       }
+
     } catch (error) {
       if (error?.response?.data?.message) {
         message.open({
@@ -144,6 +144,7 @@ const UploadFileProduct = () => {
         });
       }
     }
+    
   };
 
   const filterOption = (input, option) =>
@@ -186,7 +187,7 @@ const UploadFileProduct = () => {
 
   return (
     <div>
-      <Form layout="vertical" name="export">
+      <Form form={form} layout="vertical" name="export">
         <Form.Item
           label="Tìm kiếm và chọn sản phẩm export file"
           name="product"
@@ -200,6 +201,7 @@ const UploadFileProduct = () => {
             onChange={onChange}
             filterOption={filterOption}
             options={products || []}
+            
           />
         </Form.Item>
       </Form>

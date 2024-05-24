@@ -9,7 +9,7 @@ export const accessTokenState = atom({
 
 export const userInfoState = atom({
   key: "userInfoState",
-  default: JSON.parse(localStorage.getItem("userInfo") || {}),
+  default: JSON.parse(localStorage.getItem("userInfo")),
 });
 
 export const userInfoSelector = selector({

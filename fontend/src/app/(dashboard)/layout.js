@@ -111,7 +111,7 @@ export default function DashboardLayout({
   };
 
   useEffect(() => {
-    if (!userInfo.email) {
+    if (!userInfo?.email) {
       router.push("/login");
     }
   }, []);
@@ -122,13 +122,13 @@ export default function DashboardLayout({
   };
 
   const itemRole = () => {
-    if (userInfo.role === "admin") {
+    if (userInfo?.role === "admin") {
       return sidebarItem;
     }
-    if (userInfo.role === "user") {
+    if (userInfo?.role === "user") {
       return sidebarItem.filter((i) => i.key !== "!accounts");
     }
-    if (userInfo.role === "management") {
+    if (userInfo?.role === "management") {
       return sidebarItem.filter((i) => i.key !== "/accounts");
     }
   };
@@ -191,7 +191,7 @@ export default function DashboardLayout({
                     src={userInfo?.avatar?.url}
                     className="mr-2"
                   >
-                    {(userInfo.length > 0 && userInfo?.name[0]) || ""}
+                    {(userInfo?.length > 0 && userInfo?.name[0]) || ""}
                   </Avatar>
                   <span className="text-gray-800 font-semibold">
                     {userInfo?.name}

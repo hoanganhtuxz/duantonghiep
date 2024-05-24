@@ -1,13 +1,20 @@
 import { Select, Space } from "antd";
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
+import { extractTotalQuantities, getDateRange, processData } from "@/utils";
 
-const ApexBarChart = ({ setQueryReport, dataChart }) => {
+const ApexBarChart = ({ setQueryReport, dataChart, dataChart2 ,colorChart ='#33b2df'}) => {
+  console.log("dataChart", dataChart);
+
   const [series, setSeries] = useState([
     {
       name: "Nhập kho",
-      data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
+      data: [],
     },
+    // {
+    //   name: "Xuất kho",
+    //   data: [],
+    // },
   ]);
 
   const [options, setOptions] = useState({
@@ -17,7 +24,7 @@ const ApexBarChart = ({ setQueryReport, dataChart }) => {
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "55%",
+        columnWidth: "20%",
         endingShape: "rounded",
       },
     },
@@ -29,17 +36,10 @@ const ApexBarChart = ({ setQueryReport, dataChart }) => {
       width: 2,
       colors: ["transparent"],
     },
+    colors: [colorChart],
     xaxis: {
       categories: [
-        "12/2/2023",
-        "17/2/2023",
-        "24/2/2023",
-        "1/3/2023",
-        "8/3/2023",
-        "20/2/2023",
-        "27/3/2023",
-        "5/4/2023",
-        "17/4/2023",
+       
       ],
     },
     yaxis: {
@@ -59,23 +59,64 @@ const ApexBarChart = ({ setQueryReport, dataChart }) => {
     },
   });
 
+  useEffect(() => {
+    if (dataChart.data) {
+      {
+        const formattedDates = processData(dataChart?.data);
+        setOptions((prevData) => ({
+          ...prevData,
+          xaxis: { categories: formattedDates },
+        }));
+      }
+    }
+  }, [dataChart]);
 
+  useEffect(() => {
+    if (dataChart.data) {
+      const result = extractTotalQuantities(dataChart?.data);
+      setSeries((prev) => [
+        { ...prev[0].name, data: result },
+      ]);
+    }
+  
+  }, [dataChart2, dataChart]);
+
+  const handleOptionChange = (value) => {
+    const { startDate, endDate } = getDateRange(value);
+
+    if (!startDate || !endDate) {
+      console.error("Invalid date range");
+      return;
+    }
+
+    const startDateString = `${startDate.getFullYear()}/${(
+      startDate.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}/${startDate.getDate().toString().padStart(2, "0")}`;
+    const endDateString = `${endDate.getFullYear()}/${(endDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}/${endDate.getDate().toString().padStart(2, "0")}`;
+
+    setQueryReport({ startDate: startDateString, endDate: endDateString });
+  };
 
   return (
     <div>
       <Space>
         <p>Bộ lọc:</p>
         <Select
-          defaultValue="lucy"
+          defaultValue="1w"
+          onChange={handleOptionChange}
           style={{ width: 120 }}
           options={[
-            { value: "", label: "1 Tuần" },
-            { value: "", label: "2 Tuần" },
-            { value: "lucy", label: "1 Tháng" },
-            { value: "Yiminghe", label: "3 Tháng" },
-            { value: "disabled", label: "6 Tháng" },
-            { value: "disabled", label: "9 Tháng" },
-            { value: "disabled", label: "12 Tháng" },
+            { value: "1w", label: "1 Tuần" },
+            { value: "2w", label: "2 Tuần" },
+            { value: "1m", label: "1 Tháng" },
+            { value: "3m", label: "3 Tháng" },
+            { value: "6m", label: "6 Tháng" },
+            { value: "9m", label: "9 Tháng" },
+            { value: "12m", label: "12 Tháng" },
           ]}
         />
       </Space>

@@ -5,7 +5,7 @@ import RecoidContextProvider from "./recoilProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Inventory management",
+  title: "Interior",
   description: "Furniture management warehouse",
 };
 

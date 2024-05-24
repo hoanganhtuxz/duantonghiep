@@ -113,8 +113,8 @@ const data = [
     tags: ["cool", "teacher"],
   },
 ];
-const StatisticalTables = () => {
 
+const StatisticalTables = () => {
     return(
         <div>
               <Space className="mb-4">
