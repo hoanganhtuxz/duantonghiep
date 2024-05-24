@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Button, Modal, Form, Input, message, Select } from "antd";
+import { Button, Modal, Form, Input, message} from "antd";
 import axiosClient from "@/service/axiosConfig";
 import { useRecoilState } from "recoil";
-import { accountState } from "@/atom";
+import { conditionState} from "@/atom";
 
-const AddAccountsModal = () => {
+
+const AddStatusModal = () => {
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [, setAccounts] = useRecoilState(accountState);
+  const [, setProducts] = useRecoilState(conditionState);
+
 
   const showModal = () => {
     setVisible(true);
@@ -23,15 +25,11 @@ const AddAccountsModal = () => {
     setLoading(true);
     try {
       const values = await form.validateFields();
-      const payload = {
-        ...values,
-        role: values?.role ? values?.rol : "user",
-      };
-      const res = await axiosClient.post(`v1/accounts`, payload, {
+      const res = await axiosClient.post(`v1/condition`, values, {
         withCredentials: true,
       });
       message.success("Thêm thành công!");
-      setAccounts((prev) => [res.data.data, ...prev]);
+      setProducts((prev) => [res.data.data, ...prev]);
       setVisible(false);
       form.resetFields();
       setLoading(false);
@@ -45,8 +43,6 @@ const AddAccountsModal = () => {
     }
   };
 
-  const filterOption = (input, option) =>
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   return (
     <>
@@ -59,10 +55,11 @@ const AddAccountsModal = () => {
         onCancel={handleCancel}
         width={700}
         footer={[
-          <Button onClick={() => setVisible(false)} htmlType="button">
+          <Button key={1} onClick={() => setVisible(false)} htmlType="button">
             Huỷ
           </Button>,
           <Button
+          key={2}
             loading={loading}
             form="add-cate"
             className="bg-blue-500 "
@@ -83,35 +80,16 @@ const AddAccountsModal = () => {
           >
             <Form.Item
               name="name"
-              label="Họ và tên"
+              label="Tên phân loại"
               rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
             >
-              <Input showCount maxLength={200} placeholder="Nhập họ tên" />
+              <Input showCount maxLength={200} placeholder="Nhập tên" />
             </Form.Item>
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[{ required: true, message: "Vui lòng nhập email!" }]}
-            >
-              <Input placeholder="@gmail" />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              label="Mật khẩu"
-              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
-            >
-              <Input.Password placeholder="*******" />
-            </Form.Item>
-            <Form.Item name="role" label="Chọn quyền tài khoản">
-              <Select
-                defaultValue="user"
-                className="w-full"
-                filterOption={filterOption}
-                options={[
-                  { value: "user", label: "Người dùng" },
-                  { value: "admin", label: "Toàn quyền" },
-                  { value: "management", label: "Quản lí" },
-                ]}
+            
+            <Form.Item name="description" label="Mô tả">
+              <Input.TextArea
+                style={{ resize: "none", minHeight: "60px" }}
+                placeholder="Nhập Mô tả"
               />
             </Form.Item>
           </Form>
@@ -121,4 +99,4 @@ const AddAccountsModal = () => {
   );
 };
 
-export default AddAccountsModal;
+export default AddStatusModal;

@@ -4,9 +4,10 @@ import { IoIosAdd } from "react-icons/io";
 import { useSetRecoilState } from "recoil";
 import { queryProductState } from "@/atom";
 import { Select, Input, Button } from "antd";
-import AddProductModal from "./(component)/addProduct";
-import ProductsTable from "./(component)/listProduct";
+import AddProductModal from "../../../components/products/addProduct";
+import ProductsTable from "../../../components/products/listProduct";
 import { useRouter } from "next/navigation";
+export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const setQueryState = useSetRecoilState(queryProductState);

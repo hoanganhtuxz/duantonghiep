@@ -25,7 +25,7 @@ import { CiShoppingTag } from "react-icons/ci";
 import { logoutUser } from "@/service/auth";
 import { VscGroupByRefType } from "react-icons/vsc";
 import { LiaPercentageSolid } from "react-icons/lia";
-import ModalProfile from "./(component)/ModalProfile";
+import ModalProfile from "../../components/ModalProfile";
 
 const { Header, Sider, Content } = Layout;
 

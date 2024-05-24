@@ -3,8 +3,9 @@
 import { Input, Select } from "antd";
 import { useSetRecoilState } from "recoil";
 import { queryConditionState } from "@/atom";
-import AddStatusModal from "./(component)/addStatus";
-import StatusTable from "./(component)/listClassification";
+import AddStatusModal from "../../../components/condition/addStatus";
+import StatusTable from "../../../components/condition/listClassification";
+export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const setQueryState = useSetRecoilState(queryConditionState);

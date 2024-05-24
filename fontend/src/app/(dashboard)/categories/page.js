@@ -1,12 +1,11 @@
 "use client";
 
-import { Suspense } from "react";
-import AddCategoryModal from "./(component)/addCreateModal";
-import CategoryTable from "./(component)/listCategory";
+import AddCategoryModal from "../../../components/categories/addCreateModal";
+import CategoryTable from "../../../components/categories/listCategory";
 import { Input, Select, Dropdown, Button, Space } from "antd";
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import { useSetRecoilState } from "recoil";
 import { queryCategoryState } from "@/atom";
+export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const setQueryState = useSetRecoilState(queryCategoryState);

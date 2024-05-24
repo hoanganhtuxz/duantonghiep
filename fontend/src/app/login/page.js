@@ -5,6 +5,7 @@ import { Button, Checkbox, Form, Input, message } from "antd";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+export const dynamic = 'force-dynamic';
 
 const LoginForm = () => {
   const [form] = Form.useForm();
@@ -25,24 +26,24 @@ const LoginForm = () => {
         }
       );
       const { success, user, accessToken } = response.data;
-
       if (success) {
         setLoading(false);
-        localStorage.setItem("userInfo", JSON.stringify(user));
-        if (values.remember) {
-          localStorage.setItem("userEmail", values.email);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userInfo', JSON.stringify(user));
+          if (values.remember) {
+            localStorage.setItem('userEmail', values.email);
+          }
         }
-        router.push("/overview", { scroll: true });
+        router.push('/overview', { scroll: true });
       } else {
         setLoading(false);
-        message.error("Đăng nhập không thành công");
+        message.error('Đăng nhập không thành công');
       }
     } catch (error) {
       setLoading(false);
       message.error(error.response.data.message);
     }
   };
-
   return (
     <div className="flex justify-center w-full h-[100vh] bg-slate-100">
       <Form

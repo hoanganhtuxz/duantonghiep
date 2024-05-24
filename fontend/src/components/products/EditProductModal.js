@@ -11,7 +11,9 @@ const EditCategoryModal = ({ id_dell, data }) => {
   const [loading, setLoading] = useState(false);
   const [categoris] = useRecoilState(categoryState);
   const [, setProducts] = useRecoilState(productState);
-
+  const [condition,setCondition] = useState([])
+  const [status,setStatus] = useState([])
+  const [classification,setClassification] = useState([])
   const showModal = () => {
     setVisible(true);
   };
@@ -19,6 +21,61 @@ const EditCategoryModal = ({ id_dell, data }) => {
   const handleCancel = () => {
     setVisible(false);
   };
+
+  const fetchConditon = async () => {
+    try {
+      const response = await axiosClient.get(`/v1/condition`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setCondition(response.data.condition)
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching");
+      }
+    }
+  };
+  const fetchStatus = async () => {
+    try {
+      const response = await axiosClient.get(`/v1/status`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setStatus(response.data.status)
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching");
+      }
+    }
+  };
+  const fetchClassificaiton = async () => {
+    try {
+      const response = await axiosClient.get(`/v1/classification`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setClassification(response.data.classification)
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        message.error(error?.response?.data?.message);
+      } else {
+        message.error("Error fetching");
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchConditon();
+    fetchStatus()
+    fetchClassificaiton()
+  }, []);
 
   const handleSave = async (values) => {
     try {
@@ -144,16 +201,47 @@ const EditCategoryModal = ({ id_dell, data }) => {
               />
             </Form.Item>
             <Form.Item
-              name="category"
-              label="Chọn danh mục"
-              rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
+              name="status"
+              label="Chọn trạng thái"
             >
               <Select
                 showSearch
-                placeholder="Chọn danh mục"
-                filterOption={filterOption}
+                placeholder="Chọn trạng thái"
+                filterOption={filterOption2}
                 options={
-                  categoris?.map((i) => ({
+                  status?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="condition"
+              label="Chọn phân loại"
+            >
+              <Select
+                showSearch
+                placeholder="Chọn phân loại"
+                filterOption={filterOption3}
+                options={
+                  classification?.map((i) => ({
+                    label: i.name,
+                    value: i._id,
+                  })) || []
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="classification"
+              label="Chọn tình trạng"
+            >
+              <Select
+                showSearch
+                placeholder="Chọn tình trạng"
+                filterOption={filterOption4}
+                options={
+                  condition?.map((i) => ({
                     label: i.name,
                     value: i._id,
                   })) || []

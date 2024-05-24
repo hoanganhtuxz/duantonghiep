@@ -14,7 +14,7 @@ const nextConfig = {
       ignoreDuringBuilds: true,
     },
     swcMinify: true,
-    // fastRefresh: true,
+    fastRefresh: true,
   };
   
   export default nextConfig;

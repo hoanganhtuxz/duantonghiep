@@ -8,8 +8,18 @@ export const accessTokenState = atom({
 });
 
 export const userInfoState = atom({
-  key: "userInfoState",
-  default: JSON.parse(localStorage.getItem("userInfo")),
+  key: 'userInfoState',
+  default: null,
+  effects: [
+    ({ setSelf }) => {
+      if (typeof window !== 'undefined') {
+        const storedUserInfo = localStorage.getItem('userInfo');
+        if (storedUserInfo) {
+          setSelf(JSON.parse(storedUserInfo));
+        }
+      }
+    },
+  ],
 });
 
 export const userInfoSelector = selector({
@@ -55,7 +65,7 @@ export const queryAccountState = atom({
   default: { keyword: "", sort: "desc" },
 });
 export const queryConditionState = atom({
-  key: "queryClassificationState",
+  key: "queryConditionState",
   default: { keyword: "", sort: "desc" },
 });
 export const queryClassificationState = atom({

@@ -19,7 +19,9 @@ const getUserInfo = async () => {
       withCredentials: true,
     });
     if (response.data.success) {
-      localStorage.setItem("userInfo", JSON.stringify(response.data.user));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("userInfo", JSON.stringify(response.data.user));
+      }
     }
   } catch (error) {
     console.error("Failed to fetch user information:", error);

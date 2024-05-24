@@ -3,8 +3,9 @@
 import { Input, Select } from "antd";
 import { useSetRecoilState } from "recoil";
 import { queryAccountState } from "@/atom";
-import AddStatusModal from "./(component)/addAccounts";
-import AccountsTable from "./(component)/listAccout";
+import AddStatusModal from "../../../components/accounts/addAccounts";
+import AccountsTable from "../../../components/accounts/listAccout";
+export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const setQueryState = useSetRecoilState(queryAccountState);

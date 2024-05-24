@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import { Button, Modal, Form, Input, message} from "antd";
+import { Button, Modal, Form, Input, message } from "antd";
 import axiosClient from "@/service/axiosConfig";
 import { useRecoilState } from "recoil";
-import { conditionState} from "@/atom";
-
+import { classificationState } from "@/atom";
 
 const AddStatusModal = () => {
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [, setProducts] = useRecoilState(conditionState);
-
+  const [, setProducts] = useRecoilState(classificationState);
 
   const showModal = () => {
     setVisible(true);
@@ -25,7 +23,7 @@ const AddStatusModal = () => {
     setLoading(true);
     try {
       const values = await form.validateFields();
-      const res = await axiosClient.post(`v1/condition`, values, {
+      const res = await axiosClient.post(`v1/classification`, values, {
         withCredentials: true,
       });
       message.success("Thêm thành công!");
@@ -43,7 +41,6 @@ const AddStatusModal = () => {
     }
   };
 
-
   return (
     <>
       <Button type="primary" className="bg-blue-500" onClick={showModal}>
@@ -55,10 +52,11 @@ const AddStatusModal = () => {
         onCancel={handleCancel}
         width={700}
         footer={[
-          <Button onClick={() => setVisible(false)} htmlType="button">
+          <Button key={1} onClick={() => setVisible(false)} htmlType="button">
             Huỷ
           </Button>,
           <Button
+            key={2}
             loading={loading}
             form="add-cate"
             className="bg-blue-500 "
@@ -84,7 +82,7 @@ const AddStatusModal = () => {
             >
               <Input showCount maxLength={200} placeholder="Nhập tên" />
             </Form.Item>
-            
+
             <Form.Item name="description" label="Mô tả">
               <Input.TextArea
                 style={{ resize: "none", minHeight: "60px" }}

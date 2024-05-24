@@ -1,10 +1,10 @@
 "use client";
-
 import { Input, Select } from "antd";
 import { useSetRecoilState } from "recoil";
 import { queryStatusState } from "@/atom";
-import AddStatusModal from "./(component)/addStatus";
-import StatusTable from "./(component)/listStatus";
+import AddStatusModal from "../../../components/status/addStatus";
+import StatusTable from "../../../components/status/listStatus";
+export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const setQueryState = useSetRecoilState(queryStatusState);

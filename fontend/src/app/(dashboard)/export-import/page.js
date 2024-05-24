@@ -1,10 +1,11 @@
 "use client";
-import UploadFileProduct from "./(component)/uploadFileProduct.js";
+import UploadFileProduct from "../../../components/exportImport/uploadFileProduct.js";
 import { FaChevronLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { Radio } from "antd";
 import { useState } from "react";
-import ExportProduct from "./(component)/exportProduct.js";
+import ExportProduct from "../../../components/exportImport/exportProduct.js";
+export const dynamic = 'force-dynamic';
 
 const option = [
   {
