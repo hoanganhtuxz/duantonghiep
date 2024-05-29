@@ -11,6 +11,9 @@ import statusRouter from "./routes/status.route";
 import classificationRouter from "./routes/classification.route";
 import { conditionRouter } from './routes/condition.route';
 import reportRoute from "./routes/report.routes";
+import { fakeDateCreateCategory } from './scripts/fakeDateCategory'
+import { fakeDateCreateProduct } from "./scripts/fakeDateWareHouse";
+import { fakeDataExportReport, fakeDataImportReport } from "./scripts/insertReportData";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -54,7 +57,13 @@ app.use("/api/v1", reportRoute);
 
 // testing  api
 
-app.get("/test", (req: Request, res: Response, next: NextFunction) => {
+app.get("/test", async (req: Request, res: Response, next: NextFunction) => {
+  // await fakeDateCreateCategory(new Date('2024/03/12'), new Date('2024/05/06'));
+  await fakeDateCreateProduct(new Date('2024/03/12'), new Date('2024/05/06'));
+  await fakeDataImportReport();
+  await fakeDataExportReport();
+
+  console.log('ALL SCRIPT RAN!')
   res.status(200).json({
     succcess: true,
     message: "API is working",
