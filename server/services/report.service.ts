@@ -8,11 +8,12 @@ interface ICreateReport {
 }
 
 interface IOptionCreateReport {
-  type: string
+  type: string;
+  date?: Date;
 }
 
 export const createReportHandler = async (payload: ICreateReport[], options: IOptionCreateReport) => {
-  const now = new Date();
+  const now = options.date ? new Date(options.date) : new Date();
   now.setHours(0);
   now.setMinutes(0);
   now.setSeconds(0);
@@ -56,7 +57,8 @@ export const createReportHandler = async (payload: ICreateReport[], options: IOp
         type: options.type,
         quantity: item.quantity,
         warehouseId: item.warehouseId,
-        timestamp
+        timestamp,
+        createdAt: now
       })
     }
   }))
