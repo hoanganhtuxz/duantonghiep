@@ -6,6 +6,7 @@ import ProductModel from "../models/warehouse.model";
 import { createProduct } from "../services/warehouse.service";
 import { createReportHandler } from "../services/report.service";
 import { REPORT_EXPORT_PRODUCT, REPORT_IMPORT_PRODUCT } from "../utils/constants";
+import mongoose from "mongoose";
 
 ///  interface  Product
 
@@ -28,7 +29,11 @@ export const uploadProduct = CatchAsyncError(
         return next(new ErrorHandler("Please enter name Product", 400));
       }
       if (!code) {
-        return next(new ErrorHandler("Please enter code product", 400));
+        // return next(new ErrorHandler("Please enter code product", 400));
+        const objId = new mongoose.Types.ObjectId()
+        Object.assign(data, {
+          code: objId.toString()
+        })
       }
       // if (!categoryId) {
       //   return next(new ErrorHandler("Plase chonse category product", 400));
