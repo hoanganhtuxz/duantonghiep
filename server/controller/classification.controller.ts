@@ -26,6 +26,13 @@ export const uploadClassification = CatchAsyncError(
         return next(new ErrorHandler("Please enter name Classification", 400));
       }
 
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy, createdBy: updatedBy })
+
       createClassification(data, res, next);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -49,6 +56,12 @@ export const editClassifcation = CatchAsyncError(
       }
 
       const classificationId = req.params.id;
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy })
 
       const classification = await ClassificationModel.findByIdAndUpdate(
         classificationId,

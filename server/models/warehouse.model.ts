@@ -81,6 +81,16 @@ const warehouseSchema: Schema = new mongoose.Schema(
         }
       },
     ],
+    createdBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
+    updatedBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
   },
   { timestamps: true }
 );
