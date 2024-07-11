@@ -6,7 +6,6 @@ import { UserDocument } from "../models/user.model";
 interface ICreateReport {
   quantity: number;
   warehouseId: ObjectId | string,
-  user: UserDocument
 }
 
 interface IOptionCreateReport {

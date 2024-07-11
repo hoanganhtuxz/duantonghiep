@@ -18,6 +18,12 @@ const getGroupBy = (groupBy: any): any => {
     totalQuantity: {
       $sum: '$quantity',
     },
+    createdBy: {
+      $first: '$createdBy'
+    },
+    updatedBy: {
+      $first: '$updatedBy'
+    }
   };
 
   switch (groupBy) {
