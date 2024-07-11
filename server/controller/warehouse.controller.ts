@@ -30,9 +30,9 @@ export const uploadProduct = CatchAsyncError(
       if (!code) {
         return next(new ErrorHandler("Please enter code product", 400));
       }
-      if (!categoryId) {
-        return next(new ErrorHandler("Plase chonse category product", 400));
-      }
+      // if (!categoryId) {
+      //   return next(new ErrorHandler("Plase chonse category product", 400));
+      // }
       if (avatar) {
         const myCloud = await cloudinary.v2.uploader.upload(avatar, {
           folder: "product",
