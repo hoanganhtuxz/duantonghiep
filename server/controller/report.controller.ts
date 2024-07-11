@@ -23,6 +23,9 @@ const getGroupBy = (groupBy: any): any => {
     },
     updatedBy: {
       $first: '$updatedBy'
+    },
+    warehouseInfo: {
+      $first: '$warehouseInfo'
     }
   };
 
@@ -81,6 +84,17 @@ export const getReportController = CatchAsyncError(
 
     const resultData = await ReportModel.aggregate([
       { $match: conditionFilter },
+      {
+        $lookup: {
+          from: 'warehouses',
+          localField: 'warehouseId',
+          foreignField: '_id',
+          as: 'warehouseInfo'
+        }
+      },
+      {
+        $unwind: '$warehouseInfo'
+      },
       {
         $group: getGroupBy(groupBy),
       },
