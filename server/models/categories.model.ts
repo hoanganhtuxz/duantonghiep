@@ -27,6 +27,16 @@ const categorySchema: Schema = new Schema(
             required: false
         }
     },
+    createdBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
+    updatedBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
   },
   { timestamps: true }
 );

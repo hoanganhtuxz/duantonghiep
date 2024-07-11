@@ -39,6 +39,13 @@ export const uploadCategory = CatchAsyncError(
         };
       }
 
+      const createdBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { createdBy, updatedBy: createdBy })
+
       createCategorie(data, res, next);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -74,6 +81,13 @@ export const editCategory = CatchAsyncError(
       }
 
       const categoryId = req.params.id;
+
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy })
 
       const category = await CategoryModel.findByIdAndUpdate(
         categoryId,

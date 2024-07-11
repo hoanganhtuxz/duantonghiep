@@ -26,6 +26,13 @@ export const uploadStatus = CatchAsyncError(
         return next(new ErrorHandler("Please enter name status", 400));
       }
 
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy, createdBy: updatedBy })
+
       createStatus(data, res, next);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -49,6 +56,12 @@ export const editStatus = CatchAsyncError(
       // }
 
       const statusId = req.params.id;
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy })
 
       const status = await StatusModel.findByIdAndUpdate(
         statusId,

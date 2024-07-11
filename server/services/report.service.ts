@@ -1,14 +1,17 @@
 import { ObjectId } from "mongoose";
 import ReportModel from '../models/report.model';
+import { UserDocument } from "../models/user.model";
 
 
 interface ICreateReport {
   quantity: number;
-  warehouseId: ObjectId | string
+  warehouseId: ObjectId | string,
+  user: UserDocument
 }
 
 interface IOptionCreateReport {
-  type: string
+  type: string,
+  user: UserDocument
 }
 
 export const createReportHandler = async (payload: ICreateReport[], options: IOptionCreateReport) => {
@@ -29,6 +32,12 @@ export const createReportHandler = async (payload: ICreateReport[], options: IOp
     return rs;
   }, []);
 
+  const createdBy = {
+    _id: options.user._id,
+    email: options.user.email,
+    name: options.user.name
+  }
+
   await Promise.all(payloadGroupByWarehouseId.map(async (item: ICreateReport): Promise<void> => {
     const hasExisted = await ReportModel.findOne({
       isDeleted: false,
@@ -45,7 +54,8 @@ export const createReportHandler = async (payload: ICreateReport[], options: IOp
             $set: {
               quantity: {
                 $sum: [item.quantity, '$quantity']
-              }
+              },
+              updatedBy: createdBy
             }
           }
         ]
@@ -56,7 +66,9 @@ export const createReportHandler = async (payload: ICreateReport[], options: IOp
         type: options.type,
         quantity: item.quantity,
         warehouseId: item.warehouseId,
-        timestamp
+        timestamp,
+        createdBy,
+        updatedBy: createdBy
       })
     }
   }))

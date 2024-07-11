@@ -26,6 +26,13 @@ export const uploadCondition = CatchAsyncError(
         return next(new ErrorHandler("Please enter name Condition", 400));
       }
 
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy, createdBy: updatedBy })
+
       createCondition(data, res, next);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -49,6 +56,12 @@ export const editCondition = CatchAsyncError(
       }
 
       const conditionId = req.params.id;
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy })
 
       const condition = await ConditionModel.findByIdAndUpdate(
         conditionId,

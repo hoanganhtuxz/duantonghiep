@@ -44,6 +44,13 @@ export const uploadProduct = CatchAsyncError(
         };
       }
 
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy, createdBy: updatedBy })
+
       createProduct(data, res, next);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -98,6 +105,13 @@ export const editProduct = CatchAsyncError(
       } else {
         return next(new ErrorHandler('Please choose category product', 400));
       }
+
+      const updatedBy = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+      Object.assign(data, { updatedBy })
 
       const product = await ProductModel.findByIdAndUpdate(
         ProductId,
@@ -426,6 +440,11 @@ export const importProductController = CatchAsyncError(async (req: Request, res:
   }
 
   const payloadCreateImportReport = [];
+  const updatedBy = {
+    _id: req.user._id,
+    name: req.user.name,
+    email: req.user.email
+  }
 
   await Promise.all(payload.map(async (item: any) => {
     const productUpdated = await ProductModel.findOneAndUpdate(
@@ -435,7 +454,8 @@ export const importProductController = CatchAsyncError(async (req: Request, res:
           price: Number(item.price),
           quantity: {
             $sum: ['$quantity', Number(item.quantity)]
-          }
+          },
+          updatedBy
         }
       }],
       { new: true }
@@ -450,7 +470,7 @@ export const importProductController = CatchAsyncError(async (req: Request, res:
   }));
 
   // không cần await vì cho nó chạy ngầm để giảm thời gian response
-  createReportHandler(payloadCreateImportReport, { type: REPORT_IMPORT_PRODUCT })
+  createReportHandler(payloadCreateImportReport, { type: REPORT_IMPORT_PRODUCT, user: req.user })
   return res.status(200).json({
     success: true,
     message: 'Import product successfully.'
@@ -500,6 +520,11 @@ export const exportProductController = CatchAsyncError(async (req: Request, res:
 
   const payloadCreateExportReport = [];
   const productsNotUpdate = [];
+  const updatedBy = {
+    _id: req.user._id,
+    name: req.user.name,
+    email: req.user.email
+  }
 
   await Promise.all(payload.map(async (item: any) => {
     const productUpdated = await ProductModel.findOneAndUpdate(
@@ -508,7 +533,8 @@ export const exportProductController = CatchAsyncError(async (req: Request, res:
         $set: {
           quantity: {
             $subtract: ['$quantity', Number(item.quantity)]
-          }
+          },
+          updatedBy
         }
       }],
       { new: true }
@@ -527,7 +553,7 @@ export const exportProductController = CatchAsyncError(async (req: Request, res:
 
   if (payloadCreateExportReport.length) {
     // không cần await vì cho nó chạy ngầm để giảm thời gian response
-    createReportHandler(payloadCreateExportReport, { type: REPORT_EXPORT_PRODUCT })
+    createReportHandler(payloadCreateExportReport, { type: REPORT_EXPORT_PRODUCT, user: req.user })
   } else {
     return next(new ErrorHandler('No product has been exported.', 400))
   }

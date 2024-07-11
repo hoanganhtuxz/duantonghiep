@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import { CatchAsyncError } from './catchAsyncError'
 import ErrorHandler from '../utils/ErrorHandler'
 import { redis } from '../utils/redis';
+import { UserDocument } from '../models/user.model';
 
 
 // authenticated
@@ -25,7 +26,8 @@ export const isAutheticated = CatchAsyncError(async (req: Request, res: Response
         return next(new ErrorHandler('User is not found', 400));
     }
 
-    req.user = JSON.parse(user);
+    const userDoc: UserDocument = JSON.parse(user);
+    req.user = userDoc;
     next()
 })
 

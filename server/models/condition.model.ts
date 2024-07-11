@@ -15,6 +15,16 @@ const conditionSchema: Schema = new Schema(
     description: {
       type: String,
     },
+    createdBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
+    updatedBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
   },
   { timestamps: true }
 );

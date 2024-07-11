@@ -35,7 +35,17 @@ const reportSchema: Schema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false
-    }
+    },
+    createdBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
+    updatedBy: {
+      _id: Schema.Types.ObjectId,
+      name: String,
+      email: String
+    },
   },
   { timestamps: true }
 );

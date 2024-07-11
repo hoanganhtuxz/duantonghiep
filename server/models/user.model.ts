@@ -2,6 +2,7 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from 'bcryptjs'
 require('dotenv').config();
 import jwt from "jsonwebtoken";
+import { HydratedDocument } from "mongoose";
 
 const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -99,5 +100,7 @@ userSchema.methods.comparePassword = async function (enteredPassword: string): P
 };
 
 const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
+
+export type UserDocument = HydratedDocument<IUser>
 
 export default User;
