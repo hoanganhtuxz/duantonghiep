@@ -26,7 +26,8 @@ const getGroupBy = (groupBy: any): any => {
     },
     warehouseInfo: {
       $first: '$warehouseInfo'
-    }
+    },
+    updatedAt: {$last: '$updatedAt'}
   };
 
   switch (groupBy) {
@@ -98,6 +99,9 @@ export const getReportController = CatchAsyncError(
       {
         $group: getGroupBy(groupBy),
       },
+      { $sort: {
+        updatedAt: -1
+      }}
     ]);
 
     return res.status(200).json({
